@@ -76,3 +76,10 @@ div[data-testid="stForm"] {
     margin-top: 50px;
     padding-bottom: 30px;
 }
+
+
+/* Hide "Press Enter to submit form" */
+
+div[data-testid="InputInstructions"] {
+    display: none;
+}
