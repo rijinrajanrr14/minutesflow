@@ -8,7 +8,7 @@ from utils.constants import HEADER_TEXT, LAB_INFO
 # --- Configuration ---
 st.set_page_config(
     page_title="MinutesFlow Pro",
-    page_icon="📝",
+    page_icon="assets/favicon.png",
     layout="wide",
     initial_sidebar_state="collapsed"
 )
