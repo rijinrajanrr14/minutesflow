@@ -5,58 +5,109 @@ def generate_markdown(data):
 
     md = f"# {HEADER_TEXT}\n"
     md += f"**{LAB_INFO}**\n\n"
+
     md += f"**Project:** {data['project']}\n\n"
 
+    # ---------------- MEETING OVERVIEW ---------------- #
+
     md += "## MEETING OVERVIEW\n"
+
     md += f"- **Meeting Title:** {data['title']}\n"
     md += f"- **Date:** {data['date']}\n"
     md += f"- **Time:** {data['time_start']} – {data['time_end']}\n"
     md += f"- **Location:** {data['location']}\n"
     md += f"- **Notetaker:** {data['notetaker']}\n\n"
 
-    md += "## ATTENDEES\n"
+    # ---------------- ATTENDEES ---------------- #
 
-    present_str = ", ".join([
-        f"{a['name']} ({a['role']})"
-        for a in data['present']
-        if a['name']
-    ])
+    md += "## ATTENDEES\n\n"
 
-    absent_str = ", ".join([
-        f"{a['name']} ({a['role']})"
-        for a in data['absent']
-        if a['name']
-    ])
+    # Present
+    md += "### Present\n"
 
-    md += f"- **Present:** {present_str}\n"
-    md += f"- **Absent:** {absent_str}\n\n"
+    for attendee in data['present']:
 
-    md += "## MEETING OBJECTIVE\n"
-    md += f"{data['objective']}\n\n"
+        if attendee['name']:
 
-    md += "## AGENDA & DISCUSSION POINTS\n"
-
-    for i, item in enumerate(data['agenda_items'], 1):
-        if item['title']:
-            md += f"{i}. **{item['title']}**\n"
-            md += f"   - **Presenter:** {item['presenter']}\n"
-            md += f"   - **Key Discussion:** {item['discussion']}\n"
+            md += (
+                f"- {attendee['name']} "
+                f"({attendee['role']})\n"
+            )
 
     md += "\n"
 
-    md += "## DECISIONS MADE\n"
+    # Absent
+    if any(a['name'] for a in data['absent']):
+
+        md += "### Absent\n"
+
+        for attendee in data['absent']:
+
+            if attendee['name']:
+
+                md += (
+                    f"- {attendee['name']} "
+                    f"({attendee['role']})\n"
+                )
+
+        md += "\n"
+
+    # ---------------- OBJECTIVE ---------------- #
+
+    md += "## MEETING OBJECTIVE\n"
+
+    md += f"{data['objective']}\n\n"
+
+    # ---------------- AGENDA ---------------- #
+
+    md += "## AGENDA & DISCUSSION POINTS\n\n"
+
+    for i, item in enumerate(data['agenda_items'], 1):
+
+        if item['title']:
+
+            md += f"### {i}. {item['title']}\n\n"
+
+            md += (
+                f"- **Presenter:** "
+                f"{item['presenter']}\n\n"
+            )
+
+            md += "- **Key Discussion:**\n"
+
+            discussion_lines = item['discussion'].split("\n")
+
+            for line in discussion_lines:
+
+                if line.strip():
+
+                    md += f"  - {line.strip()}\n"
+
+            md += "\n"
+
+    # ---------------- DECISIONS ---------------- #
+
+    md += "## DECISIONS MADE\n\n"
 
     for decision in data['decisions']:
+
         if decision.strip():
+
             md += f"- {decision}\n"
 
     md += "\n"
+
+    # ---------------- ACTION ITEMS ---------------- #
+
+    md += "## ACTION ITEMS\n\n"
 
     md += "| Action Item | Responsible | Due Date | Status |\n"
     md += "| :--- | :--- | :--- | :--- |\n"
 
     for action in data['action_items']:
+
         if action['desc']:
+
             md += (
                 f"| {action['desc']} | "
                 f"{action['who']} | "
@@ -66,8 +117,18 @@ def generate_markdown(data):
 
     md += "\n"
 
-    md += "## NEXT MEETING\n"
-    md += f"- **Date & Time:** {data['next_date']} at {data['next_time']}\n"
-    md += f"- **Location:** {data['next_location']}\n"
+    # ---------------- NEXT MEETING ---------------- #
+
+    md += "## NEXT MEETING\n\n"
+
+    md += (
+        f"- **Date & Time:** "
+        f"{data['next_date']} at {data['next_time']}\n"
+    )
+
+    md += (
+        f"- **Location:** "
+        f"{data['next_location']}\n"
+    )
 
     return md

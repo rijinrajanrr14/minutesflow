@@ -20,13 +20,16 @@ def clean_text(text):
         "–": "-",
         "—": "-",
         "…": "...",
-        "\u00a0": " ",  # non-breaking space
+        "\u00a0": " ",
     }
 
     for old, new in replacements.items():
         text = text.replace(old, new)
 
-    return text.encode("latin-1", errors="ignore").decode("latin-1")
+    return text.encode(
+        "latin-1",
+        errors="ignore"
+    ).decode("latin-1")
 
 
 def generate_pdf(data):
@@ -34,32 +37,68 @@ def generate_pdf(data):
     pdf = FPDF()
 
     pdf.add_page()
-    pdf.set_auto_page_break(auto=True, margin=15)
+
+    pdf.set_auto_page_break(
+        auto=True,
+        margin=15
+    )
 
     # ---------------- HEADER ---------------- #
 
     pdf.set_font("Arial", 'B', 16)
-    pdf.cell(0, 10, clean_text(HEADER_TEXT), ln=True, align='C')
+
+    pdf.cell(
+        0,
+        10,
+        clean_text(HEADER_TEXT),
+        ln=True,
+        align='C'
+    )
 
     pdf.set_font("Arial", 'I', 10)
-    pdf.cell(0, 10, clean_text(LAB_INFO), ln=True, align='C')
+
+    pdf.cell(
+        0,
+        10,
+        clean_text(LAB_INFO),
+        ln=True,
+        align='C'
+    )
 
     pdf.ln(5)
 
     # ---------------- PROJECT ---------------- #
 
     pdf.set_font("Arial", 'B', 12)
-    pdf.cell(30, 10, "Project:", ln=0)
+
+    pdf.cell(
+        30,
+        10,
+        "Project:",
+        ln=0
+    )
 
     pdf.set_font("Arial", '', 12)
-    pdf.cell(0, 10, clean_text(data['project']), ln=True)
+
+    pdf.cell(
+        0,
+        10,
+        clean_text(data['project']),
+        ln=True
+    )
 
     pdf.ln(5)
 
     # ---------------- OVERVIEW ---------------- #
 
     pdf.set_font("Arial", 'B', 14)
-    pdf.cell(0, 10, "MEETING OVERVIEW", ln=True)
+
+    pdf.cell(
+        0,
+        10,
+        "MEETING OVERVIEW",
+        ln=True
+    )
 
     pdf.set_font("Arial", '', 11)
 
@@ -80,7 +119,11 @@ def generate_pdf(data):
     pdf.cell(
         0,
         7,
-        f"Time: {clean_text(data['time_start'])} - {clean_text(data['time_end'])}",
+        (
+            f"Time: "
+            f"{clean_text(data['time_start'])} - "
+            f"{clean_text(data['time_end'])}"
+        ),
         ln=True
     )
 
@@ -103,31 +146,82 @@ def generate_pdf(data):
     # ---------------- ATTENDEES ---------------- #
 
     pdf.set_font("Arial", 'B', 14)
-    pdf.cell(0, 10, "ATTENDEES", ln=True)
+
+    pdf.cell(
+        0,
+        10,
+        "ATTENDEES",
+        ln=True
+    )
+
+    # -------- Present -------- #
+
+    pdf.set_font("Arial", 'B', 11)
+
+    pdf.cell(
+        0,
+        7,
+        "Present",
+        ln=True
+    )
 
     pdf.set_font("Arial", '', 11)
 
-    present_str = ", ".join([
-        f"{clean_text(a['name'])} ({clean_text(a['role'])})"
-        for a in data['present']
-        if a['name']
-    ])
+    for attendee in data['present']:
 
-    absent_str = ", ".join([
-        f"{clean_text(a['name'])} ({clean_text(a['role'])})"
-        for a in data['absent']
-        if a['name']
-    ])
+        if attendee['name']:
 
-    pdf.multi_cell(0, 7, f"Present: {present_str}")
-    pdf.multi_cell(0, 7, f"Absent: {absent_str}")
+            pdf.multi_cell(
+                0,
+                7,
+                (
+                    f"- {clean_text(attendee['name'])} "
+                    f"({clean_text(attendee['role'])})"
+                )
+            )
+
+    pdf.ln(2)
+
+    # -------- Absent -------- #
+
+    if any(a['name'] for a in data['absent']):
+
+        pdf.set_font("Arial", 'B', 11)
+
+        pdf.cell(
+            0,
+            7,
+            "Absent",
+            ln=True
+        )
+
+        pdf.set_font("Arial", '', 11)
+
+        for attendee in data['absent']:
+
+            if attendee['name']:
+
+                pdf.multi_cell(
+                    0,
+                    7,
+                    (
+                        f"- {clean_text(attendee['name'])} "
+                        f"({clean_text(attendee['role'])})"
+                    )
+                )
 
     pdf.ln(5)
 
     # ---------------- OBJECTIVE ---------------- #
 
     pdf.set_font("Arial", 'B', 14)
-    pdf.cell(0, 10, "MEETING OBJECTIVE", ln=True)
+
+    pdf.cell(
+        0,
+        10,
+        "MEETING OBJECTIVE",
+        ln=True
+    )
 
     pdf.set_font("Arial", '', 11)
 
@@ -142,48 +236,84 @@ def generate_pdf(data):
     # ---------------- AGENDA ---------------- #
 
     pdf.set_font("Arial", 'B', 14)
-    pdf.cell(0, 10, "AGENDA & DISCUSSION POINTS", ln=True)
 
-    pdf.set_font("Arial", '', 11)
+    pdf.cell(
+        0,
+        10,
+        "AGENDA & DISCUSSION POINTS",
+        ln=True
+    )
 
     for i, item in enumerate(data['agenda_items'], 1):
 
         if item['title']:
 
+            # Agenda Title
+            pdf.set_font("Arial", 'B', 12)
+
+            pdf.cell(
+                0,
+                8,
+                f"{i}. {clean_text(item['title'])}",
+                ln=True
+            )
+
+            # Presenter
+            pdf.set_font("Arial", '', 11)
+
+            pdf.cell(
+                0,
+                7,
+                (
+                    f"Presenter: "
+                    f"{clean_text(item['presenter'])}"
+                ),
+                ln=True
+            )
+
+            pdf.ln(1)
+
+            # Key Discussion Heading
             pdf.set_font("Arial", 'B', 11)
 
             pdf.cell(
                 0,
                 7,
-                f"{i}. {clean_text(item['title'])}",
+                "Key Discussion:",
                 ln=True
             )
 
+            # Discussion Bullet Points
             pdf.set_font("Arial", '', 11)
 
-            pdf.cell(10)
+            discussion_lines = item['discussion'].split("\n")
 
-            pdf.cell(
-                0,
-                7,
-                f"Presenter: {clean_text(item['presenter'])}",
-                ln=True
-            )
+            for line in discussion_lines:
 
-            pdf.cell(10)
+                if line.strip():
 
-            pdf.multi_cell(
-                0,
-                7,
-                f"Key Discussion: {clean_text(item['discussion'])}"
-            )
+                    pdf.cell(5)
 
-    pdf.ln(5)
+                    pdf.multi_cell(
+                        0,
+                        7,
+                        f"- {clean_text(line.strip())}"
+                    )
+
+            pdf.ln(3)
+
+    pdf.ln(2)
 
     # ---------------- DECISIONS ---------------- #
 
     pdf.set_font("Arial", 'B', 14)
-    pdf.cell(0, 10, "DECISIONS MADE", ln=True)
+
+    pdf.cell(
+        0,
+        10,
+        "DECISIONS MADE",
+        ln=True
+    )
 
     pdf.set_font("Arial", '', 11)
 
@@ -202,7 +332,13 @@ def generate_pdf(data):
     # ---------------- ACTION ITEMS ---------------- #
 
     pdf.set_font("Arial", 'B', 14)
-    pdf.cell(0, 10, "ACTION ITEMS", ln=True)
+
+    pdf.cell(
+        0,
+        10,
+        "ACTION ITEMS",
+        ln=True
+    )
 
     # Table Header
     pdf.set_font("Arial", 'B', 10)
@@ -261,14 +397,24 @@ def generate_pdf(data):
     # ---------------- NEXT MEETING ---------------- #
 
     pdf.set_font("Arial", 'B', 14)
-    pdf.cell(0, 10, "NEXT MEETING", ln=True)
+
+    pdf.cell(
+        0,
+        10,
+        "NEXT MEETING",
+        ln=True
+    )
 
     pdf.set_font("Arial", '', 11)
 
     pdf.cell(
         0,
         7,
-        f"Date & Time: {clean_text(data['next_date'])} at {clean_text(data['next_time'])}",
+        (
+            f"Date & Time: "
+            f"{clean_text(data['next_date'])} at "
+            f"{clean_text(data['next_time'])}"
+        ),
         ln=True
     )
 
@@ -281,7 +427,9 @@ def generate_pdf(data):
 
     # ---------------- OUTPUT ---------------- #
 
-    return pdf.output(dest='S').encode(
+    return pdf.output(
+        dest='S'
+    ).encode(
         'latin-1',
         errors='ignore'
     )
