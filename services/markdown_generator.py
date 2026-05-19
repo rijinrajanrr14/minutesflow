@@ -58,6 +58,7 @@ def generate_markdown(data):
 
     md += f"{data['objective']}\n\n"
 
+
     # ---------------- AGENDA ---------------- #
 
     md += "## AGENDA & DISCUSSION POINTS\n\n"
@@ -66,15 +67,19 @@ def generate_markdown(data):
 
         if item['title']:
 
-            md += f"{i}. {item['title']}\n"
+            # Agenda Title
+            md += f"{i}. {item['title']}\n\n"
 
+            # Presenter
             md += (
                 f"Presenter: "
-                f"{item['presenter']}\n"
+                f"{item['presenter']}\n\n"
             )
 
-            md += "Key Discussion:\n"
+            # Key Discussion Heading
+            md += "Key Discussion:\n\n"
 
+            # Discussion Bullet Points
             discussion_lines = item['discussion'].split("\n")
 
             for line in discussion_lines:
@@ -83,7 +88,7 @@ def generate_markdown(data):
 
                     md += f"● {line.strip()}\n"
 
-            md += "\n"
+            md += "\n\n"
         # ---------------- ACTION ITEMS ---------------- #
 
         md += "## ACTION ITEMS\n\n"
