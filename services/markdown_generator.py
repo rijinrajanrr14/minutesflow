@@ -66,14 +66,14 @@ def generate_markdown(data):
 
         if item['title']:
 
-            md += f"### {i}. {item['title']}\n\n"
+            md += f"{i}. {item['title']}\n"
 
             md += (
-                f"- **Presenter:** "
-                f"{item['presenter']}\n\n"
+                f"Presenter: "
+                f"{item['presenter']}\n"
             )
 
-            md += "- **Key Discussion:**\n"
+            md += "Key Discussion:\n"
 
             discussion_lines = item['discussion'].split("\n")
 
@@ -81,41 +81,28 @@ def generate_markdown(data):
 
                 if line.strip():
 
-                    md += f"  - {line.strip()}\n"
+                    md += f"● {line.strip()}\n"
 
             md += "\n"
+        # ---------------- ACTION ITEMS ---------------- #
 
-    # ---------------- DECISIONS ---------------- #
+        md += "## ACTION ITEMS\n\n"
 
-    md += "## DECISIONS MADE\n\n"
+        md += "| Action Item | Responsible | Due Date | Status |\n"
+        md += "| :--- | :--- | :--- | :--- |\n"
 
-    for decision in data['decisions']:
+        for action in data['action_items']:
 
-        if decision.strip():
+            if action['desc']:
 
-            md += f"- {decision}\n"
+                md += (
+                    f"| {action['desc']} | "
+                    f"{action['who']} | "
+                    f"{action['due']} | "
+                    f"{action['status']} |\n"
+                )
 
-    md += "\n"
-
-    # ---------------- ACTION ITEMS ---------------- #
-
-    md += "## ACTION ITEMS\n\n"
-
-    md += "| Action Item | Responsible | Due Date | Status |\n"
-    md += "| :--- | :--- | :--- | :--- |\n"
-
-    for action in data['action_items']:
-
-        if action['desc']:
-
-            md += (
-                f"| {action['desc']} | "
-                f"{action['who']} | "
-                f"{action['due']} | "
-                f"{action['status']} |\n"
-            )
-
-    md += "\n"
+        md += "\n"
 
     # ---------------- NEXT MEETING ---------------- #
 

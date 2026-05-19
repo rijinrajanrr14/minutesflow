@@ -235,6 +235,8 @@ def generate_pdf(data):
 
     # ---------------- AGENDA ---------------- #
 
+    # ---------------- AGENDA ---------------- #
+
     pdf.set_font("Arial", 'B', 14)
 
     pdf.cell(
@@ -249,11 +251,11 @@ def generate_pdf(data):
         if item['title']:
 
             # Agenda Title
-            pdf.set_font("Arial", 'B', 12)
+            pdf.set_font("Arial", 'B', 11)
 
             pdf.cell(
                 0,
-                8,
+                7,
                 f"{i}. {clean_text(item['title'])}",
                 ln=True
             )
@@ -271,11 +273,7 @@ def generate_pdf(data):
                 ln=True
             )
 
-            pdf.ln(1)
-
             # Key Discussion Heading
-            pdf.set_font("Arial", 'B', 11)
-
             pdf.cell(
                 0,
                 7,
@@ -283,9 +281,7 @@ def generate_pdf(data):
                 ln=True
             )
 
-            # Discussion Bullet Points
-            pdf.set_font("Arial", '', 11)
-
+            # Bullet Points
             discussion_lines = item['discussion'].split("\n")
 
             for line in discussion_lines:
@@ -297,13 +293,10 @@ def generate_pdf(data):
                     pdf.multi_cell(
                         0,
                         7,
-                        f"- {clean_text(line.strip())}"
+                        f"* {clean_text(line.strip())}"
                     )
 
             pdf.ln(3)
-
-    pdf.ln(2)
-
     # ---------------- DECISIONS ---------------- #
 
     pdf.set_font("Arial", 'B', 14)
